@@ -5,6 +5,10 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.clevertap.demo.weatherapp.callbacks.OnTemperatureReceived;
+import com.clevertap.demo.weatherapp.unity.UnityMessageHandler;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 
 /**
@@ -28,9 +32,40 @@ public class WeatherAppBridge {
         });
     }
 
-    public static void fetchTemperature(Context context){
-
+    public static void fetchCurrentTemperature(Context context){
+        WeatherManager.getInstance(context).fetchTemperature(context, new OnTemperatureReceived() {
+            @Override
+            public void onTemperatureReceived(boolean status, double temperature) {
+                if(status){
+                    JSONObject obj =  new JSONObject();
+                    try {
+                        obj.put("temp",temperature);
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+                    UnityMessageHandler.senMessage(obj.toString());
+                }
+            }
+        });
     }
+
+    public static void fetchWeeklyTemperature(Context context){
+        WeatherManager.getInstance(context).fetchTemperature(context, new OnTemperatureReceived() {
+            @Override
+            public void onTemperatureReceived(boolean status, double temperature) {
+                if(status){
+                    JSONObject obj =  new JSONObject();
+                    try {
+                        obj.put("temp",temperature);
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+                    UnityMessageHandler.senMessage(obj.toString());
+                }
+            }
+        });
+    }
+
     public static void debugLog(String message) {
         Log.d(WeatherAppBridge.class.getCanonicalName(), message);
     }

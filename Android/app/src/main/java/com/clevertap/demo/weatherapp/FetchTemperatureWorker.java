@@ -60,7 +60,7 @@ public class FetchTemperatureWorker extends Worker {
                         Data outputData = new Data.Builder()
                                 .putDouble("temperature", temperature)
                                 .build();
-                        WeatherAppBridge.debugLog("On REsult Success!");
+                        WeatherAppBridge.debugLog("On Result Success!");
                         return Result.success(outputData);
                     }
                 }

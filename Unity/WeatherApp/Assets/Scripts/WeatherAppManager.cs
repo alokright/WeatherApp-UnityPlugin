@@ -19,13 +19,10 @@ public class WeatherAppManager : MonoBehaviour
 
     public static void Initialize()
     {
-        // If an instance already exists, we don't need to create another
         if (_instance == null)
         {
-            // Create the WeatherDetails GameObject
             GameObject weatherDetails = new GameObject(ANDROID_BRIDGE_OBJECT);
 
-            // Attach the WeatherAppManager script
             _instance = weatherDetails.AddComponent<WeatherAppManager>();
         }
     }
@@ -37,7 +34,7 @@ public class WeatherAppManager : MonoBehaviour
 
     public static void ShowTemperatureToast()
     {
-#if UNITY_ANDROID && !UNITY_EDITOR
+    #if UNITY_ANDROID && !UNITY_EDITOR
 
         using (AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
         {

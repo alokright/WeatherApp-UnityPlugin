@@ -25,6 +25,7 @@ public class WeatherManager {
     public static WeatherManager getInstance(Context context){
         if(_manager == null){
             _manager = new WeatherManager(context);
+
         }
         return _manager;
     }

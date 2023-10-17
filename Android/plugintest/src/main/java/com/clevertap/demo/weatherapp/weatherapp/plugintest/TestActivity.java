@@ -15,7 +15,6 @@ public class TestActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test);
-        new WeatherAppBridge();
         findViewById(R.id.check_temperature).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

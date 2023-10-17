@@ -1,14 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:supportsRtl="true"
         tools:targetApi="34">
 
+        <activity
+            android:name="com.clevertap.demo.weatherapp.PermissionsActivity"
+            android:resizeableActivity="false"
+            android:screenOrientation="behind"
+            android:theme="@style/TransparentActivityTheme"
+            android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale|layoutDirection|density"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden"
+            tools:targetApi="n" />
     </application>
 
 </manifest>

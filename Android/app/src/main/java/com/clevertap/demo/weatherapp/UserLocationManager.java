@@ -30,7 +30,7 @@ import com.google.android.gms.tasks.Task;
 
 public class UserLocationManager {
 
-    private static final int LOCATION_PERMISSION_REQUEST_ID = 11001;
+    public static final int LOCATION_PERMISSION_REQUEST_ID = 11001;
     private FusedLocationProviderClient mFusedLocationClient;
     private OnLocationReceived locationCallback;
     public void fetchUserLocation(Context context, OnLocationReceived locationCallback) {
@@ -78,9 +78,8 @@ public class UserLocationManager {
     }
 
     private void requestPermissions(Context context) {
-        ActivityCompat.requestPermissions((Activity) context, new String[]{
-                Manifest.permission.ACCESS_COARSE_LOCATION,
-                Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_ID);
+        Intent intent = new Intent(context,PermissionsActivity.class);
+        context.startActivity(intent);
     }
 
     private boolean isLocationEnabled(Context context) {

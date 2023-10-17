@@ -72,3 +72,5 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 Unity/WeatherApp/Library/
 Android/app/build/
+Unity/WeatherApp/Temp/
+Unity/WeatherApp/Logs/

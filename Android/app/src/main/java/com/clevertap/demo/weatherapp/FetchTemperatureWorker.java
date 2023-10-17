@@ -28,6 +28,7 @@ public class FetchTemperatureWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
+        WeatherAppBridge.debugLog("On Do Work");
         double latitude = getInputData().getDouble("latitude", 0);
         double longitude = getInputData().getDouble("longitude", 0);
 
@@ -59,6 +60,7 @@ public class FetchTemperatureWorker extends Worker {
                         Data outputData = new Data.Builder()
                                 .putDouble("temperature", temperature)
                                 .build();
+                        WeatherAppBridge.debugLog("On REsult Success!");
                         return Result.success(outputData);
                     }
                 }

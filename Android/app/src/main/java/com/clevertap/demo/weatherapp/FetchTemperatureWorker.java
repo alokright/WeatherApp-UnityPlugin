@@ -53,18 +53,27 @@ public class FetchTemperatureWorker extends Worker {
                 JSONArray temperatureArray = responseObject.getJSONObject("daily").getJSONArray("temperature_2m_max");
 
                 String todayDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
-
+                double temperature = 0f;
+                boolean isFound = false;
+                double[] dailyTemp = new double[datesArray.length()];
                 for (int i = 0; i < datesArray.length(); i++) {
                     if (datesArray.getString(i).equals(todayDate)) {
-                        double temperature = temperatureArray.getDouble(i);
-                        Data outputData = new Data.Builder()
-                                .putDouble("temperature", temperature)
-                                .build();
-                        WeatherAppBridge.debugLog("On Result Success!");
-                        return Result.success(outputData);
+                       temperature = temperatureArray.getDouble(i);
+                       isFound = true;
                     }
+                    dailyTemp[i] =  temperatureArray.getDouble(i);
                 }
-                return Result.failure();
+                Data outputData = new Data.Builder()
+                        .putDouble("temperature", temperature)
+                        .putDoubleArray("dailyTemp",dailyTemp)
+                        .build();
+
+                if(isFound){
+                    WeatherAppBridge.debugLog("On Result Success!");
+                    return Result.success(outputData);
+                }
+               else
+                    return Result.failure();
             } else {
                 return Result.failure();
             }

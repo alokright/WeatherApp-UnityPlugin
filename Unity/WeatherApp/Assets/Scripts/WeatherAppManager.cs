@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class WeatherAppManager : MonoBehaviour
@@ -48,11 +49,38 @@ public class WeatherAppManager : MonoBehaviour
         }
 
 #endif
-        Debug.Log("TEMPERATUE***");
+        Debug.Log("TEMPERATURE***");
     }
 
+<<<<<<< HEAD
     public enum ResponseStatus
     {
         Success,No_Connectivity,PERMISSION_DECLINED,PERMISSION_MISSING,GPS_DISABLED,API_FAILURE
     }
+=======
+    public static void FetchWeeklyTemperature(Action<double[]> callback)
+    {
+
+    }
+    public static void FetchCurrentTemperature(Action<double> callback)
+    {
+#if UNITY_ANDROID && !UNITY_EDITOR
+
+        using (AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
+        {
+            using (AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
+            {
+                using (AndroidJavaClass weatherAppBridge = new AndroidJavaClass("com.clevertap.demo.weatherapp.WeatherAppBridge"))
+                {
+                    weatherAppBridge.CallStatic("showTemperature", currentActivity);
+                }
+            }
+        }
+
+#endif
+        Debug.Log("TEMPERATURE***");
+    }
+
+
+>>>>>>> 43f0109ec69c60f7951eb785c87872111ffa0f38
 }

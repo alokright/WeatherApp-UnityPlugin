@@ -50,4 +50,9 @@ public class WeatherAppManager : MonoBehaviour
 #endif
         Debug.Log("TEMPERATUE***");
     }
+
+    public enum ResponseStatus
+    {
+        Success,No_Connectivity,PERMISSION_DECLINED,PERMISSION_MISSING,GPS_DISABLED,API_FAILURE
+    }
 }

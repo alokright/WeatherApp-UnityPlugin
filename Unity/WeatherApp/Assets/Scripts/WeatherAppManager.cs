@@ -48,23 +48,18 @@ public class WeatherAppManager : MonoBehaviour
             }
         }
 
-#endif
+    #endif
         Debug.Log("TEMPERATURE***");
     }
 
-<<<<<<< HEAD
-    public enum ResponseStatus
-    {
-        Success,No_Connectivity,PERMISSION_DECLINED,PERMISSION_MISSING,GPS_DISABLED,API_FAILURE
-    }
-=======
+  
     public static void FetchWeeklyTemperature(Action<double[]> callback)
     {
 
     }
     public static void FetchCurrentTemperature(Action<double> callback)
     {
-#if UNITY_ANDROID && !UNITY_EDITOR
+       #if UNITY_ANDROID && !UNITY_EDITOR
 
         using (AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
         {
@@ -77,10 +72,13 @@ public class WeatherAppManager : MonoBehaviour
             }
         }
 
-#endif
+    #endif
         Debug.Log("TEMPERATURE***");
     }
 
+    public enum ResponseStatus
+    {
+        SUCCESS, NO_CONNECTIVITY, PERMISSION_DECLINED, PERMISSION_MISSING, GPS_DISABLED, API_FAILURE
+    }
 
->>>>>>> 43f0109ec69c60f7951eb785c87872111ffa0f38
 }

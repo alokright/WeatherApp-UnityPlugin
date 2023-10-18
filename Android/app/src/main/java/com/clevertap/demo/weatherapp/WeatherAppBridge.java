@@ -1,18 +1,20 @@
 package com.clevertap.demo.weatherapp;
 
-import static com.clevertap.demo.weatherapp.WeatherAppBridge.RequestType.CURRENT_TEMPERATURE;
-import static com.clevertap.demo.weatherapp.WeatherAppBridge.RequestType.DAILY_TEMPERATURE;
-
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.core.app.ActivityCompat;
+import androidx.work.Data;
+
+import com.clevertap.demo.weatherapp.callbacks.OnLocationReceived;
 import com.clevertap.demo.weatherapp.callbacks.OnTemperatureReceived;
 import com.clevertap.demo.weatherapp.unity.UnityMessageHandler;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
+import java.util.List;
 
 /**
  * Created by Alok Kumar on 14/10/22.
@@ -27,28 +29,29 @@ public class WeatherAppBridge {
     public static void showTemperature(Context context) {
         WeatherManager.getInstance(context).fetchTemperature(context, new OnTemperatureReceived() {
             @Override
-            public void onTemperatureReceived(boolean status, double temperature) {
+            public void onTemperatureReceived(boolean status, Data temperatureData) {
                 if(status){
+                    double temperature = temperatureData.getDouble(Constants.TEMPERATURE_KEY,0);
                     showToast(context,String.format( "Current temperature at your location is %1$,.2f Celcius",temperature),Toast.LENGTH_SHORT);
-                }
+                }else
+                    showToast(context,"Error while fetching data!",Toast.LENGTH_SHORT);
             }
         });
     }
 
+    public static void fetchUserLocation(Context context){
+        new UserLocationManager().fetchUserLocation(context, new OnLocationReceived() {
+            @Override
+            public void onLocationStatus(boolean status, Location location) {
+                UnityMessageHandler.sendLocationMessage(status,location);
+            }
+        });
+    }
     public static void fetchCurrentTemperature(Context context){
         WeatherManager.getInstance(context).fetchTemperature(context, new OnTemperatureReceived() {
             @Override
-            public void onTemperatureReceived(boolean status, double temperature) {
-                if(status){
-                    JSONObject obj =  new JSONObject();
-                    try {
-                        obj.put("temp",temperature);
-                        obj.put("responseType",CURRENT_TEMPERATURE);
-                    } catch (JSONException e) {
-                        throw new RuntimeException(e);
-                    }
-                    UnityMessageHandler.senMessage(obj.toString());
-                }
+            public void onTemperatureReceived(boolean status, Data temperatureData) {
+                UnityMessageHandler.sendCurrentTemperatureMessage(status,temperatureData);
             }
         });
     }
@@ -56,17 +59,8 @@ public class WeatherAppBridge {
     public static void fetchWeeklyTemperature(Context context){
         WeatherManager.getInstance(context).fetchTemperature(context, new OnTemperatureReceived() {
             @Override
-            public void onTemperatureReceived(boolean status, double temperature) {
-                if(status){
-                    JSONObject obj =  new JSONObject();
-                    try {
-                        obj.put("temp",temperature);
-                        obj.put("responseType",DAILY_TEMPERATURE);
-                    } catch (JSONException e) {
-                        throw new RuntimeException(e);
-                    }
-                    UnityMessageHandler.senMessage(obj.toString());
-                }
+            public void onTemperatureReceived(boolean status, Data temperatureData) {
+                UnityMessageHandler.sendWeeklyTemperatureMessage(status,temperatureData);
             }
         });
     }
@@ -75,7 +69,11 @@ public class WeatherAppBridge {
         Log.d(WeatherAppBridge.class.getCanonicalName(), message);
     }
 
-    public enum RequestType{
-        CURRENT_TEMPERATURE,DAILY_TEMPERATURE
+    public static boolean checkPermissions(Context context, List<String> permissions) {
+        boolean status = true;
+        for( String permission : permissions){
+            status &= (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION)== PackageManager.PERMISSION_GRANTED);
+        }
+        return status;
     }
 }

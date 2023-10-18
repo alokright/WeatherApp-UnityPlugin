@@ -9,7 +9,6 @@ import androidx.core.app.ActivityCompat;
 
 import com.clevertap.demo.weatherapp.weatherapp.androidplugin.R;
 
-
 public class PermissionsActivity extends AppCompatActivity {
 
     @Override

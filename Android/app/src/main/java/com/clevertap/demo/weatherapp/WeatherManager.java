@@ -64,9 +64,9 @@ public class WeatherManager {
                     WeatherAppBridge.debugLog("workInfo.getState()" + workInfo.getState());
                     if (workInfo != null && workInfo.getState() == WorkInfo.State.SUCCEEDED) {
                         double temperature = workInfo.getOutputData().getDouble("temperature", 0);
-                        temperatureCallback.onTemperatureReceived(true, temperature);
+                        temperatureCallback.onTemperatureReceived(true, workInfo.getOutputData());
                     } else if (workInfo != null && workInfo.getState() == WorkInfo.State.FAILED) {
-                        temperatureCallback.onTemperatureReceived(false, 0);
+                        temperatureCallback.onTemperatureReceived(false, null);
                     }
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
@@ -79,4 +79,6 @@ public class WeatherManager {
     public static void handleLocationPermissionsResult(Context context, int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         _manager.locationManager.handlePermissionsResult(context, requestCode, permissions, grantResults);
     }
+
+
 }

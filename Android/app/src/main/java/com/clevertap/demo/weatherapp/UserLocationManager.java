@@ -28,6 +28,10 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class UserLocationManager {
 
     public static final int LOCATION_PERMISSION_REQUEST_ID = 11001;
@@ -41,7 +45,7 @@ public class UserLocationManager {
 
     @SuppressLint("MissingPermission")
     private void getLastLocation(Context context) {
-        if (checkPermissions(context)) {
+        if (checkLocationPermissions(context)) {
 
             if (isLocationEnabled(context)) {
 
@@ -68,18 +72,26 @@ public class UserLocationManager {
                     locationCallback.onLocationStatus(false,null);
             }
         } else {
-            requestPermissions(context);
+            requestLocationPermissions(context);
         }
     }
-
-    private boolean checkPermissions(Context context) {
-        return ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+    private boolean checkLocationPermissions(Context context){
+        return WeatherAppBridge.checkPermissions(context, Arrays.asList(
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION
+        ));
     }
 
-    private void requestPermissions(Context context) {
-        Intent intent = new Intent(context,PermissionsActivity.class);
+    private void requestLocationPermissions(Context context) {
+        Intent intent = new Intent(context, PermissionsActivity.class);
+        intent.putExtra(Constants.PERMISSION_ARRAY,
+                new ArrayList<>(
+                        Arrays.asList(
+                                Manifest.permission.ACCESS_COARSE_LOCATION,
+                                Manifest.permission.ACCESS_FINE_LOCATION
+                        )));
         context.startActivity(intent);
+
     }
 
     private boolean isLocationEnabled(Context context) {

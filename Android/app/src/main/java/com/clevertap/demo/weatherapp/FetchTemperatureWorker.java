@@ -64,8 +64,8 @@ public class FetchTemperatureWorker extends Worker {
                     dailyTemp[i] =  temperatureArray.getDouble(i);
                 }
                 Data outputData = new Data.Builder()
-                        .putDouble("temperature", temperature)
-                        .putDoubleArray("dailyTemp",dailyTemp)
+                        .putDouble(Constants.TEMPERATURE_KEY, temperature)
+                        .putDoubleArray(Constants.DAILY_TEMPERATURE_KEY,dailyTemp)
                         .build();
 
                 if(isFound){

@@ -1,5 +1,8 @@
 package com.clevertap.demo.weatherapp;
 
+import static com.clevertap.demo.weatherapp.WeatherAppBridge.RequestType.CURRENT_TEMPERATURE;
+import static com.clevertap.demo.weatherapp.WeatherAppBridge.RequestType.DAILY_TEMPERATURE;
+
 import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
@@ -40,6 +43,7 @@ public class WeatherAppBridge {
                     JSONObject obj =  new JSONObject();
                     try {
                         obj.put("temp",temperature);
+                        obj.put("responseType",CURRENT_TEMPERATURE);
                     } catch (JSONException e) {
                         throw new RuntimeException(e);
                     }
@@ -57,6 +61,7 @@ public class WeatherAppBridge {
                     JSONObject obj =  new JSONObject();
                     try {
                         obj.put("temp",temperature);
+                        obj.put("responseType",DAILY_TEMPERATURE);
                     } catch (JSONException e) {
                         throw new RuntimeException(e);
                     }
@@ -68,5 +73,9 @@ public class WeatherAppBridge {
 
     public static void debugLog(String message) {
         Log.d(WeatherAppBridge.class.getCanonicalName(), message);
+    }
+
+    public enum RequestType{
+        CURRENT_TEMPERATURE,DAILY_TEMPERATURE
     }
 }

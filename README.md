@@ -24,13 +24,16 @@ There are 2 different options for obtaining the plugins:
  For all cases except `git clone` follow the instructions to
 [Install Google packages for Unity](//developers.google.com/unity/instructions).
 
-#Dependencies:
+**Dependencies:**
+
 **EDM4U**
+
 Developers using `git clone` must also install the [External Dependency Manager for Unity (EDM4U)](https://github.com/googlesamples/unity-jar-resolver) using either the .tgz or .unitypackage available on the [Google APIs for Unity archive page](https://developers.google.com/unity/archive#external_dependency_manager_for_unity).
 
 If EDM4U is not installed, the project won't be able to fetch necessary Java dependencies such as the [Play Location and AppCompat depencies], resulting in runtime errors.
 
 **Newtonsoft Json Unity Package**
+
 You can add the Newtonsoft.Json library to your Unity project using Git URL, you can follow these steps:
 
 1. Open the Unity Package Manager:
@@ -51,3 +54,89 @@ Select the Package Version (12.0.2):
 
 Unity Package Manager will prompt you to select a version if the package has multiple versions. Choose the appropriate version and click "Install."
 
+
+# WeatherAppManager Usage Guide
+
+The `WeatherAppManager` class in Unity allows you to access temperature data from an Android application. This guide will walk you through the steps to use this manager effectively in your Unity project.
+
+## Methods and Functionality
+
+### `Initialize()`
+
+- **Usage**: This method initializes the `WeatherAppManager`. You should call it once at the beginning of your application.
+
+```csharp
+WeatherAppManager.Initialize();
+```
+
+### `AddCurrentTemperatureCallback(Action<double> callback)`
+
+- **Usage**: Register a callback function to receive the current temperature data.
+
+- **Example**:
+
+```csharp
+WeatherAppManager.Instance.AddCurrentTemperatureCallback((temperature) => {
+    // Handle the temperature data
+    Debug.Log("Current Temperature: " + temperature);
+});
+```
+
+### `AddLocationCallback(Action<double, double> callback)`
+
+- **Usage**: Register a callback function to receive location data (latitude and longitude).
+
+- **Example**:
+
+```csharp
+WeatherAppManager.Instance.AddLocationCallback((latitude, longitude) => {
+    // Handle the location data
+    Debug.Log("Latitude: " + latitude + ", Longitude: " + longitude);
+});
+```
+
+### `ShowToast(string message)`
+
+- **Usage**: Show a toast message on Android (device-specific).
+
+- **Example**:
+
+```csharp
+WeatherAppManager.ShowToast("Hello, Unity!");
+```
+
+### `ShowTemperatureToast()`
+
+- **Usage**: Show a temperature-related toast on Android (device-specific).
+
+- **Example**:
+
+```csharp
+WeatherAppManager.ShowTemperatureToast();
+```
+
+### `FetchWeeklyTemperature(Action<double[]> callback)`
+
+- **Usage**: Request weekly temperature data from Android and register a callback to receive the data.
+
+- **Example**:
+
+```csharp
+WeatherAppManager.FetchWeeklyTemperature((weeklyTemperatures) => {
+    // Handle the weekly temperature data
+    Debug.Log("Weekly Temperatures: " + string.Join(", ", weeklyTemperatures));
+});
+```
+
+### `FetchCurrentTemperature(Action<double> callback)`
+
+- **Usage**: Request the current temperature from Android and register a callback to receive the data.
+
+- **Example**:
+
+```csharp
+WeatherAppManager.FetchCurrentTemperature((temperature) => {
+    // Handle the current temperature data
+    Debug.Log("Current Temperature: " + temperature);
+});
+```

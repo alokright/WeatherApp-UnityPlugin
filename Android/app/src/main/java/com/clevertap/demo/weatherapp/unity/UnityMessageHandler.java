@@ -14,7 +14,13 @@ public class UnityMessageHandler {
     private static final String UNITY_GAME_OBJECT = "WeatherDetails";
     private static final String UNITY_METHOD_SEND_DATA = "ReceiveData";
 
+    /*
+    *Debug flag to disable UnitySendMessage in case of plugin test
+    */
+    private static boolean UNITY_MESSAGE_SENDING_ENABLED = true;
     public static void senMessage(String message){
+        if(!UNITY_MESSAGE_SENDING_ENABLED)
+            return;
         UnityPlayer.UnitySendMessage(UNITY_GAME_OBJECT,UNITY_METHOD_SEND_DATA,message);
     }
     public static void sendLocationMessage(boolean status, Location location){

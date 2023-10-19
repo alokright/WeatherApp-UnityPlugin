@@ -2,6 +2,7 @@ package com.clevertap.demo.weatherapp;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.util.Log;
@@ -14,6 +15,7 @@ import com.clevertap.demo.weatherapp.callbacks.OnLocationReceived;
 import com.clevertap.demo.weatherapp.callbacks.OnTemperatureReceived;
 import com.clevertap.demo.weatherapp.unity.UnityMessageHandler;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -40,6 +42,7 @@ public class WeatherAppBridge {
     }
 
     public static void fetchUserLocation(Context context){
+        WeatherManager.getInstance(context);
         new UserLocationManager().fetchUserLocation(context, new OnLocationReceived() {
             @Override
             public void onLocationStatus(boolean status, Location location) {
@@ -65,6 +68,15 @@ public class WeatherAppBridge {
         });
     }
 
+    public static void fetchCurrentTemperatureAtLocation(Context context,double latitude, double longitude){
+        WeatherManager.getInstance(context).getTemperature(context,latitude,longitude, new OnTemperatureReceived() {
+            @Override
+            public void onTemperatureReceived(boolean status, Data temperatureData) {
+                UnityMessageHandler.sendCurrentTemperatureMessage(status,temperatureData);
+            }
+        });
+    }
+
     public static void debugLog(String message) {
         Log.d(WeatherAppBridge.class.getCanonicalName(), message);
     }
@@ -72,8 +84,18 @@ public class WeatherAppBridge {
     public static boolean checkPermissions(Context context, List<String> permissions) {
         boolean status = true;
         for( String permission : permissions){
-            status &= (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION)== PackageManager.PERMISSION_GRANTED);
+            status &= (ActivityCompat.checkSelfPermission(context, permission)== PackageManager.PERMISSION_GRANTED);
         }
         return status;
     }
+
+
+    public static boolean[] checkPermissionsWithStatus(Context context, List<String> permissions) {
+        boolean[] status = new boolean[permissions.size()];
+        for (int i = 0; i < permissions.size(); i++) {
+            status[i] = ActivityCompat.checkSelfPermission(context, permissions.get(i)) == PackageManager.PERMISSION_GRANTED;
+        }
+        return status;
+    }
+
 }

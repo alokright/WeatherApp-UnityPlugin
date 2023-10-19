@@ -29,8 +29,8 @@ public class FetchTemperatureWorker extends Worker {
     @Override
     public Result doWork() {
         WeatherAppBridge.debugLog("On Do Work");
-        double latitude = getInputData().getDouble("latitude", 0);
-        double longitude = getInputData().getDouble("longitude", 0);
+        double latitude = getInputData().getDouble( Constants.LATITUDE_KEY, 0);
+        double longitude = getInputData().getDouble(Constants.LONGITUDE_KEY, 0);
 
         String urlString = "https://api.open-meteo.com/v1/forecast?latitude=" + latitude + "&longitude=" + longitude + "&timezone=IST&daily=temperature_2m_max";
         try {

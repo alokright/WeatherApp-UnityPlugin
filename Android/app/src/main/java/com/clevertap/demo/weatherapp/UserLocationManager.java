@@ -84,14 +84,7 @@ public class UserLocationManager {
 
     private void requestLocationPermissions(Context context) {
         Intent intent = new Intent(context, PermissionsActivity.class);
-        intent.putExtra(Constants.PERMISSION_ARRAY,
-                new ArrayList<>(
-                        Arrays.asList(
-                                Manifest.permission.ACCESS_COARSE_LOCATION,
-                                Manifest.permission.ACCESS_FINE_LOCATION
-                        )));
         context.startActivity(intent);
-
     }
 
     private boolean isLocationEnabled(Context context) {
@@ -135,11 +128,7 @@ public class UserLocationManager {
                                 .setPositiveButton("Open settings", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        Intent intent = new Intent();
-                                        intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                                        Uri uri = Uri.fromParts("package", context.getPackageName(), null);
-                                        intent.setData(uri);
-                                        context.startActivity(intent);
+                                      Utils.openAppSettings(context);
                                     }
                                 })
                                 .setNegativeButton("Cancel", null)

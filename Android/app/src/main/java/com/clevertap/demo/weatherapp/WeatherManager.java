@@ -2,6 +2,8 @@ package com.clevertap.demo.weatherapp;
 
 import android.content.Context;
 import android.location.Location;
+import android.os.Handler;
+import android.os.Looper;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
@@ -44,6 +46,37 @@ public class WeatherManager {
         });
     }
 
+//    public void getTemperature(Context context, double latitude, double longitude, OnTemperatureReceived temperatureCallback) {
+//        Data inputData = new Data.Builder()
+//                .putDouble("latitude", latitude)
+//                .putDouble("longitude", longitude)
+//                .build();
+//
+//        OneTimeWorkRequest fetchTemperatureRequest = new OneTimeWorkRequest.Builder(FetchTemperatureWorker.class)
+//                .setInputData(inputData)
+//                .build();
+//
+//        WorkManager.getInstance(context).enqueue(fetchTemperatureRequest);
+//
+//        LiveData<WorkInfo> liveData = WorkManager.getInstance(context).getWorkInfoByIdLiveData(fetchTemperatureRequest.getId());
+//        liveData.observeForever(new Observer<WorkInfo>() {
+//            @Override
+//            public void onChanged(WorkInfo workInfo) {
+//                try {
+//                    WeatherAppBridge.debugLog("workInfo.getState()" + workInfo.getState());
+//                    if (workInfo != null && workInfo.getState() == WorkInfo.State.SUCCEEDED) {
+//                        double temperature = workInfo.getOutputData().getDouble("temperature", 0);
+//                        temperatureCallback.onTemperatureReceived(true, workInfo.getOutputData());
+//                    } else if (workInfo != null && workInfo.getState() == WorkInfo.State.FAILED) {
+//                        temperatureCallback.onTemperatureReceived(false, null);
+//                    }
+//                } catch (JSONException e) {
+//                    throw new RuntimeException(e);
+//                }
+//            }
+//        });
+//    }
+
     public void getTemperature(Context context, double latitude, double longitude, OnTemperatureReceived temperatureCallback) {
         Data inputData = new Data.Builder()
                 .putDouble("latitude", latitude)
@@ -57,24 +90,27 @@ public class WeatherManager {
         WorkManager.getInstance(context).enqueue(fetchTemperatureRequest);
 
         LiveData<WorkInfo> liveData = WorkManager.getInstance(context).getWorkInfoByIdLiveData(fetchTemperatureRequest.getId());
-        liveData.observeForever(new Observer<WorkInfo>() {
-            @Override
-            public void onChanged(WorkInfo workInfo) {
-                try {
-                    WeatherAppBridge.debugLog("workInfo.getState()" + workInfo.getState());
-                    if (workInfo != null && workInfo.getState() == WorkInfo.State.SUCCEEDED) {
-                        double temperature = workInfo.getOutputData().getDouble("temperature", 0);
-                        temperatureCallback.onTemperatureReceived(true, workInfo.getOutputData());
-                    } else if (workInfo != null && workInfo.getState() == WorkInfo.State.FAILED) {
-                        temperatureCallback.onTemperatureReceived(false, null);
+
+        // Use a Handler to observe the LiveData on the main (UI) thread
+        new Handler(Looper.getMainLooper()).post(() -> {
+            liveData.observeForever(new Observer<WorkInfo>() {
+                @Override
+                public void onChanged(WorkInfo workInfo) {
+                    try {
+                        WeatherAppBridge.debugLog("workInfo.getState()" + workInfo.getState());
+                        if (workInfo != null && workInfo.getState() == WorkInfo.State.SUCCEEDED) {
+                            double temperature = workInfo.getOutputData().getDouble("temperature", 0);
+                            temperatureCallback.onTemperatureReceived(true, workInfo.getOutputData());
+                        } else if (workInfo != null && workInfo.getState() == WorkInfo.State.FAILED) {
+                            temperatureCallback.onTemperatureReceived(false, null);
+                        }
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
                     }
-                } catch (JSONException e) {
-                    throw new RuntimeException(e);
                 }
-            }
+            });
         });
     }
-
 
     public static void handleLocationPermissionsResult(Context context, int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         _manager.locationManager.handlePermissionsResult(context, requestCode, permissions, grantResults);

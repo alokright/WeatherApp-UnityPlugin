@@ -98,7 +98,7 @@ public class WeatherAppTestingModule : MonoBehaviour
             {
                 using (AndroidJavaClass weatherAppBridge = new AndroidJavaClass("com.clevertap.demo.weatherapp.WeatherAppBridge"))
                 {
-                    bool[] st = weatherAppBridge.CallStatic<bool[]>("checkPermissionsWithStatus", currentActivity);
+                    bool[] st = weatherAppBridge.CallStatic<bool[]>("checkPermissionsWithStatus", currentActivity,permissions);
                     nativePermissionStatus = new List<bool>(st);
                 }
             }

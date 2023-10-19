@@ -38,13 +38,14 @@ public class UserLocationManager {
     private FusedLocationProviderClient mFusedLocationClient;
     private OnLocationReceived locationCallback;
     public void fetchUserLocation(Context context, OnLocationReceived locationCallback) {
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
-        this.locationCallback = locationCallback;
+       this.locationCallback = locationCallback;
         getLastLocation(context);
     }
 
     @SuppressLint("MissingPermission")
     private void getLastLocation(Context context) {
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
+
         if (checkLocationPermissions(context)) {
 
             if (isLocationEnabled(context)) {

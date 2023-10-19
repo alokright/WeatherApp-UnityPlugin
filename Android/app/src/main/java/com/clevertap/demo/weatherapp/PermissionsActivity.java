@@ -25,7 +25,7 @@ public class PermissionsActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        WeatherManager.handleLocationPermissionsResult(this,requestCode,permissions,grantResults);
+        WeatherManager.getInstance(this).handleLocationPermissionsResult(this,requestCode,permissions,grantResults);
         finish();
     }
 }

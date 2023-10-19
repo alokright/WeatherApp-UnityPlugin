@@ -15,6 +15,10 @@ import com.clevertap.demo.weatherapp.callbacks.OnLocationReceived;
 import com.clevertap.demo.weatherapp.callbacks.OnTemperatureReceived;
 import com.clevertap.demo.weatherapp.unity.UnityMessageHandler;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import java.security.Permissions;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -90,23 +94,22 @@ public class WeatherAppBridge {
     }
 
 
-//    public static boolean[] checkPermissionsWithStatus(Context context, List<String> permissions) {
-//        boolean[] status = new boolean[permissions.size()];
-//        for (int i = 0; i < permissions.size(); i++) {
-//            status[i] = ActivityCompat.checkSelfPermission(context, permissions.get(i)) == PackageManager.PERMISSION_GRANTED;
-//        }
-//        return status;
-//    }
-    public static boolean[] checkPermissionsWithStatus(AndroidJavaObject context, AndroidJavaObject permissions) {
-        int permissionCount = permissions.Call<int>("size"); // Get the size of the permissions list
-        boolean[] status = new boolean[permissionCount];
-
-        for (int i = 0; i < permissionCount; i++) {
-            AndroidJavaObject permission = permissions.Call<AndroidJavaObject>("get", i); // Get a permission from the list
-            status[i] = ActivityCompat.checkSelfPermission(context, permission.Call<string>("toString")) == PackageManager.PERMISSION_GRANTED;
+    public static boolean[] checkPermissionsWithStatus(Context context, String permissionsJson) {
+        List<String> permissions = new ArrayList<>();
+        try {
+            JSONArray array = new JSONArray(permissionsJson);
+            for(int i =0;i<array.length();i++)
+                permissions.add(array.get(i).toString());
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
         }
 
+        boolean[] status = new boolean[permissions.size()];
+        for (int i = 0; i < permissions.size(); i++) {
+            status[i] = ActivityCompat.checkSelfPermission(context, permissions.get(i)) == PackageManager.PERMISSION_GRANTED;
+        }
         return status;
     }
+
 
 }

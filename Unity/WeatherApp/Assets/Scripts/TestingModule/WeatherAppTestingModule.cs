@@ -85,7 +85,7 @@ public class WeatherAppTestingModule : MonoBehaviour
         }
     }
 
-    public void ValidatePermissionFlow(List<string>  permissions)
+    public void ValidatePermissionFlow(List<String>  permissions)
     {
         InitializeParameters();
         //Check Permission using Unity APIS

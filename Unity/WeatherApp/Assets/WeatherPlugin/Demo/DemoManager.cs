@@ -17,14 +17,14 @@ public class DemoManager : MonoBehaviour
 
     public void FetchCurrentTemperature()
     {
-        WeatherAppManager.FetchCurrentTemperature(temperature=> {
+        WeatherAppManager.FetchCurrentTemperature((status,temperature)=> {
             WeatherAppManager.ShowToast(string.Format("Temperature received from Native {0} Celcius",temperature));
         });
     }
 
     public void FetchDailyTemperature()
     {
-        WeatherAppManager.FetchWeeklyTemperature(temperature => {
+        WeatherAppManager.FetchWeeklyTemperature((status,temperature) => {
             WeatherAppManager.ShowToast(string.Format("Weekly temperature received from Native {0} Celcius", JsonUtility.ToJson(temperature)));
         });
     }

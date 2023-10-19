@@ -10,9 +10,10 @@ public class WeatherAppTestingModule : MonoBehaviour
 {
     #region Constants
     const string VERIFIED_TEMPLATE = "<color=#13FF1C>Verified</color>";
-    const string UNVERIFIED_TEMPLATE = "<color=#FF0000>Verified</color>";
+    const string UNVERIFIED_TEMPLATE = "<color=#FF0000>Failed</color>";
     #endregion
 
+    [Header("UI Elements")]
     #region UI Elements
     [SerializeField] private Text lattitudeText;
     [SerializeField] private Text longitudeText;
@@ -22,15 +23,35 @@ public class WeatherAppTestingModule : MonoBehaviour
     [SerializeField] private Text WeatherDetailsGameObject;
     [SerializeField] private Text activityTest;
     [SerializeField] private Text classDependency;
+    [SerializeField] private Text unityPermissionsCheck;
+    [SerializeField] private Text nativePermissionsCheck;
+    [SerializeField] private Text requestingPermissionsCheck;
+    [SerializeField] private Text fetchLocation;
+    [SerializeField] private Text locationPermission;
+    [SerializeField] private Text locationMatched;
+    [SerializeField] private Text setLocation;
+    [SerializeField] private Text fetchTemperature;
+    [SerializeField] private Text temperatureMatch;
     #endregion
 
+    [Header("Test Status Text")]
     #region Test Status Text
     public string activityTestText;
     public string classDependencyText;
     public string ManifestPermissionText;
     public string WeatherDetailsGameObjectText;
+    [SerializeField] private string unityPermissionsCheckText;
+    [SerializeField] private string nativePermissionsCheckText;
+    [SerializeField] private string requestingPermissionsCheckText;
+    [SerializeField] private string fetchLocationText;
+    [SerializeField] private string locationPermissionText;
+    [SerializeField] private string locationMatchedText;
+    [SerializeField] private string setLocationText;
+    [SerializeField] private string fetchTemperatureText;
+    [SerializeField] private string ltemperatureMatchText;
     #endregion
 
+    [Header("Test Variables")]
     #region Test Variables
     [SerializeField] private bool IsValidatingIntegration = false;
     [SerializeField] private bool IsValidatingPermissions = false;
@@ -45,6 +66,7 @@ public class WeatherAppTestingModule : MonoBehaviour
     [SerializeField] private GameObject TestModuleParent;
     #endregion
 
+ 
     #region Unity Callbacks
     private void LateUpdate()
     {
@@ -113,6 +135,7 @@ public class WeatherAppTestingModule : MonoBehaviour
 
     public void openAppSettings()
     {
+#if UNITY_ANDROID && !UNITY_EDITOR
         using (AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
         {
             using (AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
@@ -123,6 +146,7 @@ public class WeatherAppTestingModule : MonoBehaviour
                 }
             }
         }
+#endif
     }
     #endregion
 
@@ -131,7 +155,9 @@ public class WeatherAppTestingModule : MonoBehaviour
     {
         text.text = string.Format("{0}-{1}", test, status ? VERIFIED_TEMPLATE : UNVERIFIED_TEMPLATE);
     }
-
+    /// <summary>
+    /// Call this method to check plugin integration
+    /// </summary>
     public void ValidateIntegration()
     {
         // Check if permissions are requested by the app
@@ -198,12 +224,18 @@ public class WeatherAppTestingModule : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Use this method to validate Positive, Negative & triggering Permissions Rationale flow
+    /// </summary>
+    /// <param name="permissions"></param>
     public void ValidatePermissionFlow(List<string> permissions)
     {
         InitializeParameters();
-        //Check Permission using Unity APIS
+        // Check Permission using Unity APIs
         List<bool> unityPermissionStatus = CheckPermissionsUnityAPI(permissions);
-        //Check Permission using Native API
+        setTestPartialStatus(unityPermissionsCheck, true, unityPermissionsCheckText);
+        // Check Permission using Native API
+#if UNITY_ANDROID && UNITY_EDITOR
         List<bool> nativePermissionStatus;
         using (AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
         {
@@ -218,7 +250,7 @@ public class WeatherAppTestingModule : MonoBehaviour
             }
         }
 
-        //Compare both status
+        // Compare both status
         bool result = true;
         for (int i = 0; i < permissions.Count; i++)
         {
@@ -226,15 +258,22 @@ public class WeatherAppTestingModule : MonoBehaviour
                 result = false;
         }
         if (result)
+        {
             ShowUserPrompt("Unity and Native permissions check are different!");
+            setTestPartialStatus(nativePermissionsCheck, true, nativePermissionsCheckText);
+        }
         else
+        {
             ShowUserPrompt("Both Unity and Native permissions check successful!");
-        //Trigger Request
+            setTestPartialStatus(nativePermissionsCheck, false, nativePermissionsCheckText);
+        }
+            
+        // Trigger Request
         for (int i = 0; i < permissions.Count; i++)
         {
             if (!unityPermissionStatus[i])
             {
-                //Request permissions
+                // Request permissions
                 using (AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
                 {
                     using (AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
@@ -245,10 +284,12 @@ public class WeatherAppTestingModule : MonoBehaviour
                         }
                     }
                 }
-            }
+                setTestPartialStatus(requestingPermissionsCheck, false, requestingPermissionsCheckText);
+            }else
+                setTestPartialStatus(requestingPermissionsCheck, true, requestingPermissionsCheckText);
         }
-
-        //Use this method to validate Positive, Negative & triggering Permissions Rationale flow
+#endif
+        // 
     }
 
     public List<bool> CheckPermissionsUnityAPI(List<string> permissionsToCheck)
@@ -278,19 +319,22 @@ public class WeatherAppTestingModule : MonoBehaviour
     public void ValidateLocation()
     {
         InitializeParameters();
-        //Set device current Lattitude and Longitute
+        // Set device current Latitude and Longitude
         if (Lattitude == int.MinValue || Longitute == int.MinValue)
         {
-            ShowUserPrompt("Please update Lattitude & Longitute for the test location");
+            ShowUserPrompt("Please update Latitude & Longitude for the test location");
+            setTestPartialStatus(fetchLocation, false, fetchLocationText);
+            setTestPartialStatus(locationMatched, false, locationMatchedText);
         }
-        //check permissions 
+
+        // Check permissions 
         if (locationPermissionToggle.isOn)
         {
             // Handle location permission logic here
         }
-        //Fetch Location
-#if UNITY_ANDROID && !UNITY_EDITOR
 
+#if UNITY_ANDROID && !UNITY_EDITOR
+        // Fetch Location
         using (AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
         {
             using (AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
@@ -301,31 +345,37 @@ public class WeatherAppTestingModule : MonoBehaviour
                 }
             }
         }
-#endif
-        //Compare fetched location and known location
-        FindObjectOfType<WeatherAppManager>().AddLocationCallback((lat, lo) => {
-            ShowUserPrompt(String.Format("Difference between known and fetched temperature is Latitude: {0}, Longitute: {1}", (Lattitude - lat), (Longitute - lo)));
+        setTestPartialStatus(fetchLocation, false, fetchLocationText);
+
+        // Compare fetched location and known location
+        FindObjectOfType<WeatherAppManager>().AddLocationCallback((status,lat, lo) => {
+            setTestPartialStatus(fetchLocation, status, fetchLocationText);
+            ShowUserPrompt(String.Format("Difference between known and fetched temperature is Latitude: {0}, Longitude: {1}", (Lattitude - lat), (Longitute - lo)));
+            setTestPartialStatus(locationMatched, ((Lattitude - lat) < 1f && (Longitute - lo) < 1f), locationMatchedText);
         });
+#endif
     }
 
     public void ValidateTemperature()
     {
         InitializeParameters();
-        //Set local temperature
+        // Set local temperature
 
         if (string.IsNullOrEmpty(currentTemperature.text) || knownTemperature == int.MinValue)
         {
-            ShowUserPrompt("Please update known temperature for the test location");
+            ShowUserPrompt("Please set temperature for the test location");
         }
 
         if (Lattitude == int.MinValue || Longitute == int.MinValue)
         {
-            ShowUserPrompt("Please update Lattitude & Longitute for the test location");
-        }
-        //set location
-        //Fetch temperature for the player location
-#if UNITY_ANDROID && !UNITY_EDITOR
+            ShowUserPrompt("Please update Latitude & Longitude for the test location");
+            setTestPartialStatus(setLocation, false, setLocationText);
+        }else
+            setTestPartialStatus(setLocation, true, setLocationText);
 
+#if UNITY_ANDROID && !UNITY_EDITOR
+        // Set location
+        // Fetch temperature for the player location
         using (AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
         {
             using (AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
@@ -336,11 +386,13 @@ public class WeatherAppTestingModule : MonoBehaviour
                 }
             }
         }
-        //Compare fetched temperature with known local temperature
-        FindObjectOfType<WeatherAppManager>().AddCurrentTemperatureCallback(temperature => {
-            ShowUserPrompt("Difference between known and fetched temperature is " + (knownTemperature - temperature));
-        });
 
+        // Compare fetched temperature with known local temperature
+        FindObjectOfType<WeatherAppManager>().AddCurrentTemperatureCallback((status,temperature) => {
+            setTestPartialStatus(fetchTemperature, status, fetchTemperatureText);
+            ShowUserPrompt("Difference between known and fetched temperature is " + (knownTemperature - temperature));
+            setTestPartialStatus(temperatureMatch, (knownTemperature - temperature < 1.0f), ltemperatureMatchText);
+        });
 #endif
     }
     #endregion

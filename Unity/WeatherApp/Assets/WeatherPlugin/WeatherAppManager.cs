@@ -8,17 +8,17 @@ public class WeatherAppManager : MonoBehaviour
 {
     private static WeatherAppManager _instance;
     private const string ANDROID_BRIDGE_OBJECT = "WeatherDetails";
-    private List<Action<double[]>> WeeklyTemperatureCallbacks = null;
-    private List<Action<double>> CurrentTemperatureCallbacks = null;
-    private List<Action<double,double>> LocationCallbacks = null;
+    private List<Action<bool,double[]>> WeeklyTemperatureCallbacks = null;
+    private List<Action<bool,double>> CurrentTemperatureCallbacks = null;
+    private List<Action<bool,double,double>> LocationCallbacks = null;
     private void Awake()
     {
         if (_instance == null)
         {
             _instance = this;
-            WeeklyTemperatureCallbacks = new List<Action<double[]>>();
-            CurrentTemperatureCallbacks = new List<Action<double>>();
-            LocationCallbacks = new List<Action<double,double>>();
+            WeeklyTemperatureCallbacks = new List<Action<bool,double[]>>();
+            CurrentTemperatureCallbacks = new List<Action<bool,double>>();
+            LocationCallbacks = new List<Action<bool,double,double>>();
             DontDestroyOnLoad(this.gameObject);
         }
         else if (_instance != this)
@@ -37,12 +37,12 @@ public class WeatherAppManager : MonoBehaviour
         }
     }
 
-    public void AddCurrentTemperatureCallback(Action<double> callback)
+    public void AddCurrentTemperatureCallback(Action<bool,double> callback)
     {
         CurrentTemperatureCallbacks.Add(callback);
     }
 
-    public void AddLocationCallback(Action<double,double> callback)
+    public void AddLocationCallback(Action<bool,double,double> callback)
     {
         LocationCallbacks.Add(callback);
     }
@@ -51,36 +51,50 @@ public class WeatherAppManager : MonoBehaviour
     {
        Dictionary<string,object> json =  JsonConvert.DeserializeObject<Dictionary<string, object>>(data);
         RequestType requestType = (RequestType)Enum.Parse(typeof(RequestType), json[Constants.REQUEST_TYPE_KEY].ToString());
-
+        bool requestStatus = false;
+        bool.TryParse(json[Constants.RESPONSE_STATUS_KEY].ToString(), out requestStatus);
         switch (requestType)
         {
             case RequestType.CURRENT_TEMPERATURE:
-                double temperature = double.Parse(json[Constants.TEMPERATURE_KEY].ToString());
+                double temperature = 0;
+                if(requestStatus)
+                    temperature = double.Parse(json[Constants.TEMPERATURE_KEY].ToString());
                 foreach(var call in CurrentTemperatureCallbacks)
                 {
                     if (call != null)
-                        call.Invoke(temperature);
+                        call.Invoke(requestStatus,temperature);
                 }
                 CurrentTemperatureCallbacks.Clear();
                 break;
             case RequestType.DAILY_TEMPERATURE:
-                JArray jArray = (JArray)json[Constants.DAILY_TEMPERATURE_KEY];
-                double[] dailyTemperature = jArray.ToObject<double[]>();
+                double[] dailyTemperature = null;
+                if (requestStatus)
+                {
+                    JArray jArray = (JArray)json[Constants.DAILY_TEMPERATURE_KEY];
+                    dailyTemperature = jArray.ToObject<double[]>();
+                }
+               
                 foreach (var call in WeeklyTemperatureCallbacks)
                 {
                     if (call != null)
-                        call.Invoke(dailyTemperature);
+                        call.Invoke(requestStatus,dailyTemperature);
                 }
                 WeeklyTemperatureCallbacks.Clear();
                 break;
             case RequestType.LOCATION:
 
-                double lat = double.Parse(json[Constants.LATITUDE_KEY].ToString());
-                double lo = double.Parse(json[Constants.LONGITUDE_KEY].ToString());
+                double lat = int.MinValue;
+                double lo = int.MinValue;
+                if (requestStatus)
+                {
+                    lat = double.Parse(json[Constants.LATITUDE_KEY].ToString());
+                    lo = double.Parse(json[Constants.LONGITUDE_KEY].ToString());
+                }
+               
                 foreach (var call in LocationCallbacks)
                 {
                     if (call != null)
-                        call.Invoke(lat,lo);
+                        call.Invoke(requestStatus,lat,lo);
                 }
                 LocationCallbacks.Clear();
                 break;
@@ -127,7 +141,7 @@ public class WeatherAppManager : MonoBehaviour
     }
 
    
-    public static void FetchWeeklyTemperature(Action<double[]> callback)
+    public static void FetchWeeklyTemperature(Action<bool,double[]> callback)
     {
         _instance.WeeklyTemperatureCallbacks.Add(callback);
          #if UNITY_ANDROID && !UNITY_EDITOR
@@ -145,7 +159,7 @@ public class WeatherAppManager : MonoBehaviour
 
 #endif
     }
-    public static void FetchCurrentTemperature(Action<double> callback)
+    public static void FetchCurrentTemperature(Action<bool,double> callback)
     {
         _instance.CurrentTemperatureCallbacks.Add(callback);
 #if UNITY_ANDROID && !UNITY_EDITOR

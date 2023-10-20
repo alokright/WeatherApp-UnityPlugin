@@ -4,7 +4,7 @@
 
 The WeatherApp Plugin for Unity provides C# APIs for accessing various ways to access 
 temperature using Weather API [https://api.open-meteo.com/v1/forecast?latitude=19.07&longitude=72.87&timezone=IST&daily=t] 
-and fetching location details from the device. 
+and fetching location details from the device. Permission flow is handled by the plugin and there is no need to change launcher activity. 
 
 ## Version support
 
@@ -12,7 +12,7 @@ These plugins support Unity 2018.4 or later and Android sdk above API LEVEL 24.
 
 ## Downloading the plugins
 
-There are 2 different options for obtaining the plugins:
+There are two different options for obtaining the plugins:
 
 *   Download individual plugins as `.unitypackage` files or Unity Package
     Manager (`.tgz`) files git
@@ -25,6 +25,9 @@ There are 2 different options for obtaining the plugins:
 [Install Google packages for Unity](//developers.google.com/unity/instructions).
 
 **Dependencies:**
+**AndroidX and Jetifier**
+
+Need changes in build.gradle to enable them.
 
 **EDM4U**
 
@@ -140,3 +143,72 @@ WeatherAppManager.FetchCurrentTemperature((temperature) => {
     Debug.Log("Current Temperature: " + temperature);
 });
 ```
+
+## Testing Module Usage
+
+In the `WeatherAppPlugin` demo folder, you'll find a testing module named `WeatherAppTestingModule.cs`. This module allows you to test various aspects of your integration and permissions. Additionally, a prefab named `WeatherAppTestingModule` is provided in the demo folder that you can add to your scene to quickly test the plugin with various scenarios.
+
+Here's how to use it:
+
+1. **Add the Testing Module Prefab to Your Scene**:
+
+   - In the Unity project, locate the `WeatherAppTestingModule` prefab in the demo folder.
+
+   - Drag and drop this prefab into your Unity scene to quickly set up the testing module.
+
+   ![Add Prefab](https://github.com/alokright/UnityAdaptiveIconsSupport/blob/master/prefab.png)
+
+2. **Open the Testing Module Scene**:
+
+   - Open the Unity scene that includes the `WeatherAppTestingModule` component. This component contains all the testing functionality.
+
+
+3. **Toggle Testing Module**:
+
+   - Use the "Toggle Test Module" button to show or hide the testing module's user interface.
+
+   ![Toggle Test Module](https://github.com/alokright/UnityAdaptiveIconsSupport/blob/master/WhatsApp%20Image%202023-10-20%20at%2009.12.13%20(1).jpeg)
+
+4. **Execute Integration Tests**:
+
+   - Tap the "Execute Integration Tests" button to validate the integration of your app with the WeatherApp plugin. It checks permissions, GameObject presence, and class dependencies.
+
+
+5. **Execute Permission Flow Test**:
+
+   - Tap the "Execute Permission Flow Test" button to validate permission-related functionality, including requesting permissions. This is where you can simulate various permission scenarios, such as granted, denied, and never-ask-me-again.
+
+   ![Permission Flow Test](https://github.com/alokright/UnityAdaptiveIconsSupport/blob/master/WhatsApp%20Image%202023-10-20%20at%2009.12.14.jpeg)
+   ![Permission Flow Test](https://github.com/alokright/UnityAdaptiveIconsSupport/blob/master/WhatsApp%20Image%202023-10-20%20at%2009.12.13.jpeg)
+ 
+
+6. **Execute Location Test**:
+
+   - Tap the "Execute Location Test" button to validate location-related functionality. The module will compare the fetched location with the known location.
+
+7. **Execute Temperature Test**:
+
+   - Tap the "Execute Temperature Test" button to validate temperature-related functionality. The module will compare the fetched temperature with the known local temperature.
+
+8. **Open App Settings**:
+
+   - Tap the "Open App Settings" button to open the app settings on the Android device. This is useful for managing permissions and simulating different permission scenarios, including granted, denied, and never-ask-me-again.
+
+   ![Open App Settings](https://github.com/alokright/UnityAdaptiveIconsSupport/blob/master/Frame%208.png)
+
+Using the testing module and the provided prefab, you can easily and quickly test your plugin with various scenarios, including different permission settings. This allows you to ensure that your app functions as expected under different conditions.
+
+## Known Issues:
+
+### 1. Error Code Propagation
+
+The current system does not consistently propagate error codes back to the Unity codebase, which can make it challenging to identify and address specific issues. 
+
+### 2. Lack of Request and Response IDs
+
+Requests and responses lack unique identifiers (IDs), making it difficult to correlate and track them, especially when handling multiple requests simultaneously.
+
+
+### 3. Challenges with Handling Multiple Requests
+
+The current implementation faces issues when handling multiple requests concurrently. This can result in conflicts, data corruption, or unexpected behavior.

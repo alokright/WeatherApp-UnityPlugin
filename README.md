@@ -202,7 +202,7 @@ Using the testing module and the provided prefab, you can easily and quickly tes
 
 ### 1. Error Code Propagation
 
-The current system does not consistently propagate error codes back to the Unity codebase, which can make it challenging to identify and address specific issues. 
+The current system does not propagate error codes back to Unity, which can make it challenging to identify and address specific issues. 
 
 ### 2. Lack of Request and Response IDs
 
@@ -211,4 +211,6 @@ Requests and responses lack unique identifiers (IDs), making it difficult to cor
 
 ### 3. Challenges with Handling Multiple Requests
 
-The current implementation faces issues when handling multiple requests concurrently. This can result in conflicts, data corruption, or unexpected behavior.
+The current implementation faces issues when handling multiple requests concurrently. 
+### 4. Lack of Internet connectivity check
+

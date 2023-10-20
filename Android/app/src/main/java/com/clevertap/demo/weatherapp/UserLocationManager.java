@@ -117,6 +117,7 @@ public class UserLocationManager {
     public void handlePermissionsResult(Context context, int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == LOCATION_PERMISSION_REQUEST_ID) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                ((Activity) context).finish();
                 getLastLocation(context);
             } else {
                 if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -130,9 +131,15 @@ public class UserLocationManager {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                       Utils.openAppSettings(context);
+                                        ((Activity) context).finish();
                                     }
                                 })
-                                .setNegativeButton("Cancel", null)
+                                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        ((Activity) context).finish();
+                                    }
+                                })
                                 .show();
                     } else {
                         ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_ID);

@@ -59,8 +59,8 @@ public class WeatherAppTestingModule : MonoBehaviour
     [SerializeField] private bool IsValidatingLocation = false;
     [SerializeField] private bool IsValidatingTemperature = false;
     [SerializeField] private double knownTemperature = int.MinValue;
-    [SerializeField] private double Lattitude = int.MinValue;
-    [SerializeField] private double Longitute = int.MinValue;
+     private double Lattitude = int.MinValue;
+     private double Longitute = int.MinValue;
     [SerializeField] private bool testNativeMessage = false;
     [SerializeField] private string nativeMessageJson = null;
     [SerializeField] private GameObject TestModuleParent;
@@ -233,9 +233,8 @@ public class WeatherAppTestingModule : MonoBehaviour
         InitializeParameters();
         // Check Permission using Unity APIs
         List<bool> unityPermissionStatus = CheckPermissionsUnityAPI(permissions);
-        setTestPartialStatus(unityPermissionsCheck, true, unityPermissionsCheckText);
         // Check Permission using Native API
-#if UNITY_ANDROID && UNITY_EDITOR
+    #if UNITY_ANDROID && !UNITY_EDITOR
         List<bool> nativePermissionStatus;
         using (AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
         {
@@ -252,22 +251,28 @@ public class WeatherAppTestingModule : MonoBehaviour
 
         // Compare both status
         bool result = true;
+        bool nativeStatus = true;
+        bool unityStatus = true;
         for (int i = 0; i < permissions.Count; i++)
         {
+            nativeStatus &= nativePermissionStatus[i];
+            unityStatus &= unityPermissionStatus[i];
             if (unityPermissionStatus[i] != nativePermissionStatus[i])
                 result = false;
         }
         if (result)
         {
             ShowUserPrompt("Unity and Native permissions check are different!");
-            setTestPartialStatus(nativePermissionsCheck, true, nativePermissionsCheckText);
+           
         }
         else
         {
             ShowUserPrompt("Both Unity and Native permissions check successful!");
             setTestPartialStatus(nativePermissionsCheck, false, nativePermissionsCheckText);
         }
-            
+        setTestPartialStatus(nativePermissionsCheck, nativeStatus, nativePermissionsCheckText);
+        setTestPartialStatus(unityPermissionsCheck, unityStatus, unityPermissionsCheckText);
+
         // Trigger Request
         for (int i = 0; i < permissions.Count; i++)
         {

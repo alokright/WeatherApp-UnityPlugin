@@ -22,7 +22,7 @@ public class WeatherAppManager : MonoBehaviour
             LocationCallbacks = new List<Action<bool,double,double>>();
 
 #if UNITY_ANDROID && !UNITY_EDITOR
-            _platformBridge = new AndroidBridge();
+            _platformBridge = new AndroidPlatformBridge();
 #elif UNITY_IOS && !UNITY_EDITOR
             _platformBridge = new iOSBridge();
 #else

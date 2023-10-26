@@ -46,37 +46,6 @@ public class WeatherManager {
         });
     }
 
-//    public void getTemperature(Context context, double latitude, double longitude, OnTemperatureReceived temperatureCallback) {
-//        Data inputData = new Data.Builder()
-//                .putDouble("latitude", latitude)
-//                .putDouble("longitude", longitude)
-//                .build();
-//
-//        OneTimeWorkRequest fetchTemperatureRequest = new OneTimeWorkRequest.Builder(FetchTemperatureWorker.class)
-//                .setInputData(inputData)
-//                .build();
-//
-//        WorkManager.getInstance(context).enqueue(fetchTemperatureRequest);
-//
-//        LiveData<WorkInfo> liveData = WorkManager.getInstance(context).getWorkInfoByIdLiveData(fetchTemperatureRequest.getId());
-//        liveData.observeForever(new Observer<WorkInfo>() {
-//            @Override
-//            public void onChanged(WorkInfo workInfo) {
-//                try {
-//                    WeatherAppBridge.debugLog("workInfo.getState()" + workInfo.getState());
-//                    if (workInfo != null && workInfo.getState() == WorkInfo.State.SUCCEEDED) {
-//                        double temperature = workInfo.getOutputData().getDouble("temperature", 0);
-//                        temperatureCallback.onTemperatureReceived(true, workInfo.getOutputData());
-//                    } else if (workInfo != null && workInfo.getState() == WorkInfo.State.FAILED) {
-//                        temperatureCallback.onTemperatureReceived(false, null);
-//                    }
-//                } catch (JSONException e) {
-//                    throw new RuntimeException(e);
-//                }
-//            }
-//        });
-//    }
-
     public void getTemperature(Context context, double latitude, double longitude, OnTemperatureReceived temperatureCallback) {
         Data inputData = new Data.Builder()
                 .putDouble("latitude", latitude)

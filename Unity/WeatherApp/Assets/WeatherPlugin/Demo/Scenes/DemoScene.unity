@@ -378,7 +378,7 @@ GameObject:
   - component: {fileID: 589792268}
   - component: {fileID: 589792267}
   m_Layer: 5
-  m_Name: Button (2)
+  m_Name: FetchWeeklyTemperatureButton (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -524,12 +524,12 @@ GameObject:
   - component: {fileID: 714703291}
   - component: {fileID: 714703290}
   m_Layer: 5
-  m_Name: Button (3)
+  m_Name: TestModuleButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &714703289
 RectTransform:
   m_ObjectHideFlags: 0
@@ -686,7 +686,7 @@ GameObject:
   - component: {fileID: 1260548212}
   - component: {fileID: 1260548211}
   m_Layer: 5
-  m_Name: Button (1)
+  m_Name: FetchTemperatureButton (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1314,7 +1314,7 @@ GameObject:
   - component: {fileID: 1935285259}
   - component: {fileID: 1935285262}
   m_Layer: 5
-  m_Name: Button
+  m_Name: ShowTemperatureButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

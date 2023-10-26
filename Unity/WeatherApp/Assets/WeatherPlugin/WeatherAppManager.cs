@@ -7,7 +7,8 @@ using Newtonsoft.Json;
 public class WeatherAppManager : MonoBehaviour
 {
     private static WeatherAppManager _instance;
-    private const string ANDROID_BRIDGE_OBJECT = "WeatherDetails";
+    private IPlatformBridge _platformBridge;
+    private const string UNITY_BRIDGE_OBJECT = "WeatherDetails";
     private List<Action<bool,double[]>> WeeklyTemperatureCallbacks = null;
     private List<Action<bool,double>> CurrentTemperatureCallbacks = null;
     private List<Action<bool,double,double>> LocationCallbacks = null;
@@ -19,6 +20,15 @@ public class WeatherAppManager : MonoBehaviour
             WeeklyTemperatureCallbacks = new List<Action<bool,double[]>>();
             CurrentTemperatureCallbacks = new List<Action<bool,double>>();
             LocationCallbacks = new List<Action<bool,double,double>>();
+
+#if UNITY_ANDROID && !UNITY_EDITOR
+            _platformBridge = new AndroidBridge();
+#elif UNITY_IOS && !UNITY_EDITOR
+            _platformBridge = new iOSBridge();
+#else
+            _platformBridge = new EditorBridge();
+#endif
+
             DontDestroyOnLoad(this.gameObject);
         }
         else if (_instance != this)
@@ -32,7 +42,7 @@ public class WeatherAppManager : MonoBehaviour
     {
         if (_instance == null)
         {
-            GameObject weatherDetails = new GameObject(ANDROID_BRIDGE_OBJECT);
+            GameObject weatherDetails = new GameObject(UNITY_BRIDGE_OBJECT);
             _instance = weatherDetails.AddComponent<WeatherAppManager>();
         }
     }
@@ -101,88 +111,78 @@ public class WeatherAppManager : MonoBehaviour
         }
     }
 
-
+    /// <summary>
+    /// Show native toast with message
+    /// </summary>
+    /// <param name="message">Message to be shown</param>
     public static void ShowToast(string message)
     {
-#if UNITY_ANDROID && !UNITY_EDITOR
-
-        using (AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
-        {
-            using (AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
-            {
-                using (AndroidJavaClass weatherAppBridge = new AndroidJavaClass("com.clevertap.demo.weatherapp.WeatherAppBridge"))
-                {
-                    weatherAppBridge.CallStatic("showToast", currentActivity,message,0);
-                }
-            }
-        }
-
-#endif
+        _instance._platformBridge.ShowToast(message);
         Debug.Log("ShowToast***");
     }
-
+    /// <summary>
+    /// Show current temperature via native toast
+    /// </summary>
     public static void ShowTemperatureToast()
     {
-    #if UNITY_ANDROID && !UNITY_EDITOR
-
-        using (AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
-        {
-            using (AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
-            {
-                using (AndroidJavaClass weatherAppBridge = new AndroidJavaClass("com.clevertap.demo.weatherapp.WeatherAppBridge"))
-                {
-                    weatherAppBridge.CallStatic("showTemperature", currentActivity);
-                }
-            }
-        }
-
-    #endif
+        _instance._platformBridge.ShowTemperatureToast();
         Debug.Log("TEMPERATURE***");
     }
 
-   
+   /// <summary>
+   /// Fetch weekly temperature 
+   /// </summary>
+   /// <param name="callback"> Action with bool request status and double array with temeperature</param>
     public static void FetchWeeklyTemperature(Action<bool,double[]> callback)
     {
         _instance.WeeklyTemperatureCallbacks.Add(callback);
-         #if UNITY_ANDROID && !UNITY_EDITOR
-
-        using (AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
-        {
-            using (AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
-            {
-                using (AndroidJavaClass weatherAppBridge = new AndroidJavaClass("com.clevertap.demo.weatherapp.WeatherAppBridge"))
-                {
-                    weatherAppBridge.CallStatic("fetchWeeklyTemperature", currentActivity);
-                }
-            }
-        }
-
-#endif
+        _instance._platformBridge.FetchWeeklyTemperature();
     }
+    /// <summary>
+    /// Fetch cuurent temperature
+    /// </summary>
+    /// <param name="callback">Action with bool request status and temeperature</param>
     public static void FetchCurrentTemperature(Action<bool,double> callback)
     {
         _instance.CurrentTemperatureCallbacks.Add(callback);
-#if UNITY_ANDROID && !UNITY_EDITOR
-
-        using (AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
-        {
-            using (AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
-            {
-                using (AndroidJavaClass weatherAppBridge = new AndroidJavaClass("com.clevertap.demo.weatherapp.WeatherAppBridge"))
-                {
-                    weatherAppBridge.CallStatic("fetchCurrentTemperature", currentActivity);
-                }
-            }
-        }
-
-#endif
+        _instance._platformBridge.FetchCurrentTemperature();
         Debug.Log("TEMPERATURE***");
     }
 
+    /// <summary>
+    /// Native response code
+    /// </summary>
     public enum ResponseStatus
     {
-        SUCCESS, NO_CONNECTIVITY, PERMISSION_DECLINED, PERMISSION_MISSING, GPS_DISABLED, API_FAILURE
+        /// <summary>
+        /// Success
+        /// </summary>
+        SUCCESS,
+        /// <summary>
+        /// No internet connectivity
+        /// </summary>
+        NO_CONNECTIVITY,
+        /// <summary>
+        /// Location permission denied
+        /// </summary>
+        PERMISSION_DECLINED,
+        /// <summary>
+        /// Permission entry missing from manifest
+        /// </summary>
+        PERMISSION_MISSING,
+        /// <summary>
+        /// GPS disabled on the device
+        /// </summary>
+        GPS_DISABLED,
+        /// <summary>
+        /// Weather API unresponsive
+        /// </summary>
+        API_FAILURE
+
     }
+    /// <summary>
+    /// Native Request type
+    /// </summary>
     public enum RequestType
     {
         CURRENT_TEMPERATURE, DAILY_TEMPERATURE, LOCATION
